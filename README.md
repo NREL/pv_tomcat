@@ -13,7 +13,7 @@ input_df = generate_input(tmy_file, optics_file, out_file = 'TOMCAT_input.csv')
 
 ## Optics input file format
 
-The optics file details where solar radiaiton is abosorbed within the module and photocurrent changes for different angles of incidence. It must be a `.csv` file with the following column names. Note that all values should include cosine losses from angle of incidence:  
+The optics file details where solar radiaiton is abosorbed within the module and photocurrent changes for different angles of incidence. It must be a `.csv` file with the following column names. Note that all values should include cosine losses from angle of incidence.  
 `angle` The angle of incidence for solar illumination in degrees, 0 is normal  
 `glass_abs_W/m2` Absorbed energy in the front glass  
 `encapsulant_abs_W/m2` Absorbed energy in the front encapsulant  
