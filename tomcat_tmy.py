@@ -141,11 +141,12 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     }
 
     # Interpolations for each column in optics
+    # Note the removal of cosine factor
     interp_kwargs = {'fill_value': 'extrapolate', 'kind': 'linear'}
-    glass_abs = interp1d(optics['angle'], optics['glass_abs_W/m2'], **interp_kwargs)
-    encapsulant_abs = interp1d(optics['angle'], optics['encapsulant_abs_W/m2'], **interp_kwargs)
-    cell_abs = interp1d(optics['angle'], optics['cell_abs_W/m2'], **interp_kwargs)
-    current_derate = interp1d(optics['angle'], optics['current_derate'], **interp_kwargs)
+    glass_abs = interp1d(optics['angle'], optics['glass_abs_W/m2'] / np.cos(np.deg2rad(optics['angle'])), **interp_kwargs)
+    encapsulant_abs = interp1d(optics['angle'], optics['encapsulant_abs_W/m2'] / np.cos(np.deg2rad(optics['angle'])), **interp_kwargs)
+    cell_abs = interp1d(optics['angle'], optics['cell_abs_W/m2'] / np.cos(np.deg2rad(optics['angle'])), **interp_kwargs)
+    current_derate = interp1d(optics['angle'], optics['current_derate'] / np.cos(np.deg2rad(optics['angle'])), **interp_kwargs)
 
     # build the output
     out = pd.DataFrame()
