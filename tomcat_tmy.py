@@ -59,6 +59,24 @@ def projected_sun_elevation(elevation, azimuth):
     return projected
 
 
+def hemi_ave(theta, y, lower_limit=0, upper_limit=90, step=1):
+    '''
+    Numerical hemispherical avarage as for a function y(theta) where theta is
+    the zenith in degrees.
+    '''
+
+    y_interp = interp1d(theta, y, fill_value='extrapolate')
+
+    theta_grid = np.arange(lower_limit, upper_limit + step / 10.0, step)
+    y_grid = y_interp(theta_grid)
+
+    theta_grid = np.deg2rad(theta_grid)
+
+    ave = np.trapz(y_grid * np.sin(theta_grid), theta_grid) / np.trapz(np.sin(theta_grid), theta_grid)
+
+    return ave
+
+
 def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, out_file=None):
     '''
     Generates TOMCAT input based on TMY and optical data
@@ -113,9 +131,14 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
 
     # Parse the optics file
     optics = pd.read_csv(optics_file)
-    diffuse = optics[optics['angle'] == 'diffuse'].to_dict(orient='records')[0]
-    optics = optics[optics['angle'] != 'diffuse'].copy()
-    optics['angle'] = optics['angle'].apply(float)
+
+    # Calculate values for diffuse irradiance
+    diffuse = {
+        'cell_abs_W/m2': hemi_ave(optics['angle'], optics['cell_abs_W/m2']),
+        'encapsulant_abs_W/m2': hemi_ave(optics['angle'], optics['encapsulant_abs_W/m2']),
+        'glass_abs_W/m2': hemi_ave(optics['angle'], optics['glass_abs_W/m2']),
+        'current_derate': hemi_ave(optics['angle'], optics['current_derate'])
+    }
 
     # Interpolations for each column in optics
     interp_kwargs = {'fill_value': 'extrapolate', 'kind': 'linear'}
