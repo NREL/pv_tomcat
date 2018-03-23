@@ -41,7 +41,7 @@ def ground_temp(ambient_temperature, GHI):
 
     Paramaters
     ----------
-    ambient_temperature is in celcius
+    ambient_temperature is in celsius
     GHI is in w/m^2
     '''
     ground_temperature = ambient_temperature - 1.362 + 1.287e-2 * GHI + 273.15
