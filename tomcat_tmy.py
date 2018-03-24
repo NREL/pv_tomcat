@@ -127,6 +127,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
 
     # Calculate clearness index
     clearness_index = tmy['GHI (W/m^2)'] / tmy['ETR (W/m^2)']
+    clearness_index = clearness_index.replace([np.inf, -np.inf], np.nan)
     clearness_index = clearness_index.fillna(1)
 
     # Parse the optics file
