@@ -136,7 +136,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
 
     if max(optics['angle']) < 85:
         warnings.warn('The maximum angle in optics_file is <85 degrees. TOMCAT requires optical '
-                      'data at high angles. An interpolation to 90 degrees will be pefromed, '
+                      'data at high angles. An interpolation to 90 degrees will be performed, '
                       'but the results may be unphysical!')
 
     # We will be extrapolating to 90 but don't want things going negative
@@ -184,7 +184,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     out['current_factor'] = current_derate(aoi) * beam / poai + diffuse['current_derate'] * sky / poai
     out['current_factor'] = out['current_factor'].fillna(0.0)
 
-    out['elapsed'] = (out.index - out.index[0]).astype(np.timedelta64()) / 1e9
+    out['elapsed'] = 3600. + (out.index - out.index[0]).astype(np.timedelta64()) / 1.e9
     out.set_index('elapsed', inplace=True)
 
     if out_file:
