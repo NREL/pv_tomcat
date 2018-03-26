@@ -6,6 +6,17 @@ import csv
 import warnings
 
 
+def tetens(dew_point):
+    'Calculate vapor pressure in Pa based on dew_point in celcius'
+
+    if dew_point >= 0:
+        Pw = 6.1078 * np.exp((17.27 * dew_point) / (dew_point + 237.3))
+    elif dew_point < 0:
+        Pw = 6.1078 * np.exp((21.875 * dew_point) / (dew_point + 265.5))
+
+    return Pw
+
+
 def sky_temp(dew_point, clearness_index, ambient_temperature):
     '''
     Calculate the sky temperature in Kelvins according to the model from
@@ -21,10 +32,11 @@ def sky_temp(dew_point, clearness_index, ambient_temperature):
     clearness index = GHI/Extraterrestrial horizontal
 
     '''
-    a = [123.1415, 11.3444, 4.2073, 0.4447]  # coefficients fit in Golden
+
+    a = [76.56, 10.59, 4.557, 0.4437]  # coefficients fit in Golden
 
     # Tetens equation for vapor pressure
-    Pw = 6.1078 * np.exp((17.27 * dew_point) / (dew_point + 237.3))
+    Pw = tetens(dew_point)
 
     TskyEst = a[0] + a[1] * np.log(Pw) - a[2] * clearness_index + \
         a[3] * (ambient_temperature + 273.15)
