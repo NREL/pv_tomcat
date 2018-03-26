@@ -14,14 +14,14 @@ def sky_temp(dew_point, clearness_index, ambient_temperature):
     "Spectrally-selective mirrors with combined optical and thermal benefit
     for photovoltaic module thermal management." ACS Photonics (2018)
 
-    Paramaters
+    Parameters
     ----------
-    input temperatures in celcius
+    input temperatures in Celsius
 
     clearness index = GHI/Extraterrestrial horizontal
 
     '''
-    a = [123.1415, 11.3444, 4.2073, 0.4447]  # coeffeciencts fit in Golden
+    a = [123.1415, 11.3444, 4.2073, 0.4447]  # coefficients fit in Golden
 
     # Tetens equation for vapor pressure
     Pw = 6.1078 * np.exp((17.27 * dew_point) / (dew_point + 237.3))
@@ -40,9 +40,9 @@ def ground_temp(ambient_temperature, GHI):
     "Spectrally-selective mirrors with combined optical and thermal benefit
     for photovoltaic module thermal management." ACS Photonics (2018)
 
-    Paramaters
+    Parameters
     ----------
-    ambient_temperature is in celsius
+    ambient_temperature is in Celsius
     GHI is in w/m^2
     '''
     ground_temperature = ambient_temperature - 1.362 + 1.287e-2 * GHI + 273.15
@@ -62,7 +62,7 @@ def projected_sun_elevation(elevation, azimuth):
 
 def hemi_ave(theta, y, lower_limit=0, upper_limit=90, step=1):
     '''
-    Numerical hemispherical avarage as for a function y(theta) where theta is
+    Numerical hemispherical average as for a function y(theta) where theta is
     the zenith in degrees.
     '''
 
@@ -82,7 +82,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     '''
     Generates TOMCAT input based on TMY and optical data
 
-    Paramaters
+    Parameters
     ----------
     tmy_file: str specifying the TMY file
     optics_file: str specifying the optics file
@@ -93,7 +93,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
 
     Returns
     -------
-    Pandas dataframe of finitie element model output
+    Pandas dataframe of finite element model input time series
     '''
 
     # Parse the TMY file
