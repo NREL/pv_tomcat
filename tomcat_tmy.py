@@ -139,6 +139,18 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
                       'data at high angles. An interpolation to 90 degrees will be pefromed, '
                       'but the results may be unphysical!')
 
+    # We will be extrapolating to 90 but don't want things going negative
+    if max(optics['angle']) < 90:
+        row = {
+            'angle': 90.0,
+            'glass_abs_W/m2': 0.0,
+            'encapsulant_abs_W/m2': 0.0,
+            'cell_abs_W/m2': 0.0,
+            'current_derate': 0.0
+        }
+
+        optics.append(row, ignore_index=True)
+
     # Calculate values for diffuse irradiance
     diffuse = {
         'cell_abs_W/m2': hemi_ave(optics['angle'], optics['cell_abs_W/m2']),
