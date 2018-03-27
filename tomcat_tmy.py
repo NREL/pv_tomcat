@@ -158,7 +158,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
             'glass_abs_W/m2': 0.0,
             'encapsulant_abs_W/m2': 0.0,
             'cell_abs_W/m2': 0.0,
-            'current_derate': 0.0
+            'current_factor': 0.0
         }
 
         optics.append(row, ignore_index=True)
@@ -168,7 +168,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
         'cell_abs_W/m2': hemi_ave(optics['angle'], optics['cell_abs_W/m2']),
         'encapsulant_abs_W/m2': hemi_ave(optics['angle'], optics['encapsulant_abs_W/m2']),
         'glass_abs_W/m2': hemi_ave(optics['angle'], optics['glass_abs_W/m2']),
-        'current_derate': hemi_ave(optics['angle'], optics['current_derate'])
+        'current_factor': hemi_ave(optics['angle'], optics['current_factor'])
     }
 
     # Interpolations for each column in optics
@@ -177,7 +177,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     glass_abs = interp1d(optics['angle'], optics['glass_abs_W/m2'] / np.cos(np.deg2rad(optics['angle'])), **interp_kwargs)
     encapsulant_abs = interp1d(optics['angle'], optics['encapsulant_abs_W/m2'] / np.cos(np.deg2rad(optics['angle'])), **interp_kwargs)
     cell_abs = interp1d(optics['angle'], optics['cell_abs_W/m2'] / np.cos(np.deg2rad(optics['angle'])), **interp_kwargs)
-    current_derate = interp1d(optics['angle'], optics['current_derate'] / np.cos(np.deg2rad(optics['angle'])), **interp_kwargs)
+    current_factor = interp1d(optics['angle'], optics['current_factor'] / np.cos(np.deg2rad(optics['angle'])), **interp_kwargs)
 
     # build the output
     out = pd.DataFrame()
@@ -193,7 +193,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     out['abs_glass'] = glass_abs(aoi) * beam / 1000.0 + diffuse['glass_abs_W/m2'] * sky / 1000.0
     out['abs_cell'] = cell_abs(aoi) * beam / 1000.0 + diffuse['cell_abs_W/m2'] * sky / 1000.0
     out['abs_encapsulant'] = encapsulant_abs(aoi) * beam / 1000.0 + diffuse['encapsulant_abs_W/m2'] * sky / 1000.0
-    out['current_factor'] = current_derate(aoi) * beam / poai + diffuse['current_derate'] * sky / poai
+    out['current_factor'] = current_factor(aoi) * beam / poai + diffuse['current_factor'] * sky / poai
     out['current_factor'] = out['current_factor'].fillna(0.0)
 
     out['elapsed'] = 3600. + (out.index - out.index[0]).astype(np.timedelta64()) / 1.e9
