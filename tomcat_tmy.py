@@ -10,9 +10,9 @@ def tetens(dew_point):
     'Calculate vapor pressure in Pa based on dew_point in celcius'
 
     if dew_point >= 0:
-        Pw = 6.1078 * np.exp((17.27 * dew_point) / (dew_point + 237.3))
+        Pw = 610.78 * np.exp((17.27 * dew_point) / (dew_point + 237.3))
     elif dew_point < 0:
-        Pw = 6.1078 * np.exp((21.875 * dew_point) / (dew_point + 265.5))
+        Pw = 610.78 * np.exp((21.875 * dew_point) / (dew_point + 265.5))
 
     return Pw
 
