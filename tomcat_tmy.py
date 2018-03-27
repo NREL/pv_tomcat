@@ -133,7 +133,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     aoi = pvlib.irradiance.aoi(array_tilt, array_azimuth, sun.apparent_zenith, sun.azimuth)
 
     # Calculate poai components
-    beam = tmy['DNI (W/m^2)'] * np.cos(np.pi / 180.0 * aoi)
+    beam = tmy['DNI (W/m^2)'] * np.cos(np.deg2rad(aoi))
     beam = np.clip(beam, 0, None)
     sky = pvlib.irradiance.isotropic(array_tilt, tmy['DHI (W/m^2)'])
     poai = beam + sky
@@ -188,7 +188,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     out['poai'] = poai
     out['dni'] = tmy['DNI (W/m^2)']
     out['wind_speed'] = tmy['Wspd (m/s)']
-    out['elevation_projected'] = projected_sun_elevation(sun['apparent_elevation'] * np.pi / 180.0, sun['azimuth'] * np.pi / 180.0)
+    out['elevation_projected'] = projected_sun_elevation(np.deg2rad(sun['apparent_elevation']), np.deg2rad(sun['azimuth']))
 
     out['abs_glass'] = glass_abs(aoi) * beam / 1000.0 + diffuse['glass_abs_W/m2'] * sky / 1000.0
     out['abs_cell'] = cell_abs(aoi) * beam / 1000.0 + diffuse['cell_abs_W/m2'] * sky / 1000.0
