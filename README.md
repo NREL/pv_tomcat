@@ -3,7 +3,7 @@ Code to prepare TOMCAT input based on TMY files
 
 ## Usage
 
-The following example generate an input file for FEM calculations called `TOMCAT_input.csv` based on [TMY](https://www.nrel.gov/docs/fy08osti/43156.pdf) and optics input files.
+The following example generate an input file for FEM calculations called `TOMCAT_input.csv` based on [TMY3](https://www.nrel.gov/docs/fy08osti/43156.pdf) and optics input files.
 
 ```python
 from tomcat_tmy import generate_input
