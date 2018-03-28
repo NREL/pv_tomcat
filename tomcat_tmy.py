@@ -7,7 +7,7 @@ import warnings
 
 
 def tetens(dew_point):
-    'Calculate vapor pressure in Pa based on dew_point in celcius'
+    'Calculate vapor pressure in Pa based on dew_point in Celsius'
 
     if dew_point >= 0:
         Pw = 610.78 * np.exp((17.27 * dew_point) / (dew_point + 237.3))
@@ -36,7 +36,7 @@ def sky_temp(dew_point, clearness_index, ambient_temperature):
     a = [76.56, 10.59, 4.557, 0.4437]  # coefficients fit in Golden
 
     # Tetens equation for vapor pressure
-    Pw = tetens(dew_point)
+    Pw = [tetens(dew_point_datum) for dew_point_datum in dew_point]
 
     TskyEst = a[0] + a[1] * np.log(Pw) - a[2] * clearness_index + \
         a[3] * (ambient_temperature + 273.15)
@@ -129,7 +129,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     tmy.index = tmy.index.tz_localize('UTC')
 
     # Calculate sun position
-    sun = pvlib.solarposition.get_solarposition(tmy.index, lat, lon, altitude=elevation)
+    sun = pvlib.solarposition.get_solarposition(tmy.index, lat, lon, altitude=elevation, pressure=100.*tmy['Pressure (mbar)'].mean(), temperature=tmy['Dry-bulb (C)'])
     aoi = pvlib.irradiance.aoi(array_tilt, array_azimuth, sun.apparent_zenith, sun.azimuth)
 
     # Calculate poai components
