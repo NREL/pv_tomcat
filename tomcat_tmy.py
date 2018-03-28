@@ -65,10 +65,11 @@ def ground_temp(ambient_temperature, GHI):
 def projected_sun_elevation(elevation, azimuth, array_azimuth):
     '''
     Calculates the sun's elevation angle, projected into the plane that
-    contains the 'up' vector and the module's surface normal.
-    Uses sun elevation, azimuth, and the array's azimuth, all in radians.
-    This is used by the finite element model to calculate the position of
-    the array's own shadow for purposes of the ground temperature pattern.
+    contains the 'up' vector and the module's surface normal. This function
+    assumes a fixed-tilt array. This is used by the finite element model to
+    calculate the position of the array's own shadow for purposes of the
+    ground temperature pattern. Uses sun elevation, azimuth, and the array's
+    azimuth, all in radians.
     '''
     projected = np.clip(
         np.arctan2(
