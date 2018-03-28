@@ -123,7 +123,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     '''
 
     # Parse the TMY file
-    with open(tmy_file, newline='') as f:
+    with open(tmy_file) as f:
         reader = csv.reader(f)
         tmy_meta = next(reader)
 
