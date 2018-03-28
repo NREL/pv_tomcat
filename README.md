@@ -3,7 +3,7 @@ Code to prepare TOMCAT input based on TMY files
 
 ## Usage
 
-The following example generate an input file for FEM calculations called `TOMCAT_input.csv` based on [TMY](https://www.nrel.gov/docs/fy08osti/43156.pdf) and optics input files.
+The following example generate an input file for FEM calculations called `TOMCAT_input.csv` based on [TMY3](https://www.nrel.gov/docs/fy08osti/43156.pdf) and optics input files.
 
 ```python
 from tomcat_tmy import generate_input
@@ -18,4 +18,4 @@ The optics file details where solar radiaiton is abosorbed within the module and
 `glass_abs_W/m2` Absorbed energy in the front glass  
 `encapsulant_abs_W/m2` Absorbed energy in the front encapsulant  
 `cell_abs_W/m2` Absorbed energy in the front cell  
-`current_derate` The fractional change in photocurrent from relative to the value corespsonding to the baseline effeciency in the FEM simulation
+`current_factor` The fractional change in photocurrent from relative to the value corespsonding to the baseline effeciency in the FEM simulation
