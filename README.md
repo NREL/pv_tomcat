@@ -18,4 +18,4 @@ The optics file details where solar radiaiton is abosorbed within the module and
 `glass_abs_W/m2` Absorbed energy in the front glass  
 `encapsulant_abs_W/m2` Absorbed energy in the front encapsulant  
 `cell_abs_W/m2` Absorbed energy in the front cell  
-`current_derate` The fractional change in photocurrent from relative to the value corespsonding to the baseline effeciency in the FEM simulation
+`current_factor` The fractional change in photocurrent from relative to the value corespsonding to the baseline effeciency in the FEM simulation
