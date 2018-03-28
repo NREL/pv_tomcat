@@ -62,13 +62,20 @@ def ground_temp(ambient_temperature, GHI):
     return ground_temperature
 
 
-def projected_sun_elevation(elevation, azimuth):
+def projected_sun_elevation(elevation, azimuth, array_azimuth):
     '''
-    Calculates sun projected elevation in radians from
-    sun elevation and azimuth, both in radians
+    Calculates the sun's elevation angle, projected into the plane that
+    contains the 'up' vector and the module's surface normal.
+    Uses sun elevation, azimuth, and the array's azimuth, all in radians.
+    This is used by the finite element model to calculate the position of
+    the array's own shadow for purposes of the ground temperature pattern.
     '''
-    projected = np.clip(np.arctan2(
-        np.tan(elevation), -np.cos(azimuth)), 0., np.pi)
+    projected = np.clip(
+        np.arctan2(
+            np.tan(elevation), -np.cos(azimuth + (np.pi - array_azimuth))
+        ),
+        0., np.pi
+    )
     return projected
 
 
@@ -99,7 +106,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     tmy_file: str specifying the TMY file
     optics_file: str specifying the optics file
     array_tilt: The tilt of the PV array in degrees. 0 is horizontal
-    array_azimuth: The azimuth of the PV array in degrees. 0 is north
+    array_azimuth: The azimuth of the PV array in degrees east of north. 0 is north
     out_file (optional): str specifying output file. If None, no file
         is written
 
@@ -188,7 +195,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     out['poai'] = poai
     out['dni'] = tmy['DNI (W/m^2)']
     out['wind_speed'] = tmy['Wspd (m/s)']
-    out['elevation_projected'] = projected_sun_elevation(np.deg2rad(sun['apparent_elevation']), np.deg2rad(sun['azimuth']))
+    out['elevation_projected'] = projected_sun_elevation(np.deg2rad(sun['apparent_elevation']), np.deg2rad(sun['azimuth']), np.deg2rad(array_azimuth))
 
     out['abs_glass'] = glass_abs(aoi) * beam / 1000.0 + diffuse['glass_abs_W/m2'] * sky / 1000.0
     out['abs_cell'] = cell_abs(aoi) * beam / 1000.0 + diffuse['cell_abs_W/m2'] * sky / 1000.0
