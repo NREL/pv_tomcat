@@ -110,7 +110,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
 
     Parameters
     ----------
-    tmy_file: str specifying the TMY file
+    tmy_file: str specifying a TMY3 file
     optics_file: str specifying the optics file
     array_tilt: The tilt of the PV array in degrees. 0 is horizontal
     array_azimuth: The azimuth of the PV array in degrees east of north. 0 is north
