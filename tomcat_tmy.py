@@ -139,7 +139,7 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     # Calculate sun position
     sun = pvlib.solarposition.get_solarposition(tmy.index, lat, lon, altitude=elevation,
                                                 pressure=100. * tmy['Pressure (mbar)'].mean(),
-                                                temperature=tmy['Dry-bulb (C)'])
+                                                temperature=tmy['Dry-bulb (C)'].mean())
     aoi = pvlib.irradiance.aoi(array_tilt, array_azimuth, sun.apparent_zenith, sun.azimuth)
 
     # Calculate poai components
