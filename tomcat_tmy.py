@@ -143,10 +143,16 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     tmy.index = tmy.index.tz_localize('UTC')
 
     # Calculate sun position
-    sun = pvlib.solarposition.get_solarposition(tmy.index, lat, lon, altitude=elevation,
+    # We care about the sun position halfway through the interval preceeding
+    # each time stamp
+    sun = pvlib.solarposition.get_solarposition(tmy.index - pd.Timedelta('30 Minutes'), lat, lon,
+                                                altitude=elevation,
                                                 pressure=100. * tmy['Pressure (mbar)'].mean(),
                                                 temperature=tmy['Dry-bulb (C)'].mean())
-    aoi = pvlib.irradiance.aoi(array_tilt, array_azimuth, sun['apparent_zenith'], sun['azimuth'])
+    aoi = pvlib.irradiance.aoi(array_tilt, array_azimuth, sun.apparent_zenith, sun.azimuth)
+    # Get aoi and sun back on the same datetime index as tmy
+    sun.index = sun.index + pd.Timedelta('30 Minutes')
+    aoi.index = aoi.index + pd.Timedelta('30 Minutes')
 
     # Calculate poai components
     beam = tmy['DNI (W/m^2)'] * np.cos(np.deg2rad(aoi))
