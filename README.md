@@ -1,4 +1,4 @@
-# TOMCAT_TMY
+# pv_tomcat
 Code to prepare TOMCAT input based on TMY files
 
 ## Usage
