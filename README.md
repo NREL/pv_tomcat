@@ -19,3 +19,13 @@ The optics file details where solar radiaiton is abosorbed within the module and
 `encapsulant_abs_W/m2` Absorbed energy in the front encapsulant  
 `cell_abs_W/m2` Absorbed energy in the front cell  
 `current_factor` The fractional change in photocurrent from relative to the value corespsonding to the baseline effeciency in the FEM simulation
+
+## Executing the COMSOL run
+
+Place the `TOMCAT_input.csv` in the same directory as a compiled COMSOL `java` file (after compiling it is a `class` file) and execute your system's equivalent of
+
+```comsol batch -inputfile /path/to/wherever/you/put/TOMCAT_TMY.class -nosave```
+
+This will automatically produce `ModelOutput_Power.csv` and `ModelOutput_Temperature.csv` results files when the run is complete.
+
+An example `TOMCAT_TMY.class` file and the `TOMCAT_TMY.java` file it is based on are provided.
