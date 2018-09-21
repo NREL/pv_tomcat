@@ -1,61 +1,82 @@
-/** Compile with something like:
+/**
 
-/Applications/COMSOL53a/Multiphysics/bin/comsol compile -jdkroot /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/ TOMCAT_TMY.java
+Compile with something like:
 
-*/
+/Applications/COMSOL53a/Multiphysics/bin/comsol compile -jdkroot `/usr/libexec/java_home -v 1.8*` /full/path/to/TOMCAT_TMY.java
+
+Place the .class file in the same location as a TOMCAT_input.csv and a TOMCAT_tilt.txt file.
+
+Run from the COMSOL GUI or from the terminal with something like:
+
+/Applications/COMSOL53a/Multiphysics/bin/comsol batch -inputfile /full/path/to/TOMCAT_TMY.class
+
+**/
 
 import java.io.*;
 import com.comsol.model.*;
 import com.comsol.model.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class TOMCAT_TMY {
 
   public static Model run() {
     Model model = ModelUtil.create("Model");
 
+    // This sets the COMSOL modelPath to wherever the .class file currently sits
+    // This means that COMSOL_input.csv and TOMCAT_tilt.txt are always loaded from the same location at the .class file
     ClassLoader loader = TOMCAT_TMY.class.getClassLoader();
     File file = new File( loader.getResource(TOMCAT_TMY.class.getSimpleName() + ".class").getPath() );
     model.modelPath(file.getParent().toString() + "/");
-    System.out.println("path is:");
-    System.out.println(model.modelPath());
 
     model.label("TOMCATModel.mph");
 
-    model.comments("untitled\n\n");
+    // This loads the first line of TOMCAT_tilt.txt and interprets it as a tilt in degrees
+    String tilt = new String( "" );
+    Path tilt_file = Paths.get(model.modelPath() + "TOMCAT_tilt.txt");
+    try {
+        List<String> lines = Files.readAllLines(tilt_file);
+        tilt = lines.get(0);
+    } catch (IOException e) {
+        System.out.println(e);
+    }
 
-    model.param().set("thkFrontSheet", "3.2[mm]");
-    model.param().set("thkFrontEncapsulant", ".4[mm]");
-    model.param().set("thkCell", "150[um]");
-    model.param().set("thkBackEncapsulant", ".4[mm]");
-    model.param().set("thkBackSheet", "300[um]");
-    model.param().set("thkModule", "thkBackSheet+thkBackEncapsulant+thkCell+thkFrontEncapsulant+thkFrontSheet");
-    model.param().set("kFrontSheet", "1[W/m/K]", "solite datasheet");
-    model.param().set("kFrontEncapsulant", ".26[W/m/K]", "measured at NREL");
-    model.param().set("kCell", "148[W/m/K]", "lu 2007");
+    // Physical properties and geometry parameters are set here
+    model.param().set("thkFrontSheet", "3.2[mm]", "front sheet (usually glass) thickness");
+    model.param().set("thkFrontEncapsulant", ".4[mm]", "front encapsulant (usually EVA) thickness");
+    model.param().set("thkCell", "150[um]", "cell thickness");
+    model.param().set("thkBackEncapsulant", ".4[mm]", "back encapsulant (usually EVA) thickness");
+    model.param().set("thkBackSheet", "300[um]", "back sheet (usually multi-layer polymer) thickness");
+    model.param().set("thkModule", "thkBackSheet+thkBackEncapsulant+thkCell+thkFrontEncapsulant+thkFrontSheet", "total laminate thickness");
+    model.param().set("kFrontSheet", "1[W/m/K]", "front sheet thermal conductivity, from AGC Solite low-iron glass datasheet");
+    model.param().set("kFrontEncapsulant", ".26[W/m/K]", "front encapsulant thermal conductivity, measured at NREL for EVA");
+    model.param().set("kCell", "148[W/m/K]", "From Lu 2007 for crystalline silicon");
     model.param().set("kBackEncapsulant", "kFrontEncapsulant");
-    model.param().set("kBackSheet", ".26[W/m/K]");
-    model.param().set("epsFrontSheet", "0.88", "measured at NREL");
-    model.param().set("epsBackSheet", "0.87", "measured at NREL");
+    model.param().set("kBackSheet", ".26[W/m/K]", "back sheet thermal conductivity, measured at NREL for a PVF-PET-EVA backsheet");
+    model.param().set("epsFrontSheet", "0.88", "front sheet thermal emissivity, measured at NREL for Solite low-iron glass");
+    model.param().set("epsBackSheet", "0.87", "back sheet thermal emissivity, measured at NREL for a PVF-PET-EVA backsheet");
     model.param().set("epsGround", "0.88", "value for concrete from Incropera Dewitt p931");
-    model.param().set("tilt", "20[deg]");
-    model.param().set("hAboveGround", ".5[m]");
-    model.param().set("hModule", "1[m]");
-    model.param().set("convectionLengthFactor", ".56");
-    model.param().set("rowPitch", "2*hModule/cos(tilt)");
-    model.param().set("efficiencyElectricalSTC", "0.171");
-    model.param().set("efficiencyElectricalTempCo", "-0.0039");
-    model.param().set("densityFrontSheet", "2500[kg/m^3]", "solite datasheet");
-    model.param().set("densityFrontEncapsulant", "960[kg/m^3]", "armstrong 2010 for EVA");
+    model.param().set("tilt", tilt+"[deg]");
+    model.param().set("hAboveGround", ".5[m]", "height of bottom edge above ground");
+    model.param().set("hModule", "1[m]", "slant height of the module (measured along the tilted surface)");
+    model.param().set("convectionLengthFactor", ".56", "fitting parameter to modify flat plate convection for a tilted module");
+    model.param().set("rowPitch", "2*hModule/cos(tilt)", "a simple rule of thumb for tilt-dependent row spacing");
+    model.param().set("efficiencyElectricalSTC", "0.171", "STC efficiency of the module");
+    model.param().set("efficiencyElectricalTempCo", "-0.0039", "temperature coefficient of the module, in K^-1");
+    model.param().set("densityFrontSheet", "2500[kg/m^3]", "from AGC Solite low-iron glass datasheet");
+    model.param().set("densityFrontEncapsulant", "960[kg/m^3]", "front encapsulant density from Armstrong 2010 for EVA");
     model.param().set("densityBackEncapsulant", "densityFrontEncapsulant");
-    model.param().set("densityBackSheet", "1200[kg/m^3]", "jones 2001");
-    model.param().set("densityCell", "2330[kg/m^3]", "jones 2001");
-    model.param().set("specificHeatFrontSheet", "720[J/kg/K]", "solite datasheet");
-    model.param().set("specificHeatFrontEncapsulant", "2090[J/kg/K]", "armstrong 2010 for EVA");
+    model.param().set("densityBackSheet", "1200[kg/m^3]", "back sheet density, from Jones 2001");
+    model.param().set("densityCell", "2330[kg/m^3]", "cell density, from Jones 2001");
+    model.param().set("specificHeatFrontSheet", "720[J/kg/K]", "front sheet specific heat, from AGC Solite low-iron glass datasheet");
+    model.param().set("specificHeatFrontEncapsulant", "2090[J/kg/K]", "front encapsulant specific heat, from Armstrong 2010 for EVA");
     model.param().set("specificHeatBackEncapsulant", "specificHeatFrontEncapsulant");
-    model.param().set("specificHeatBackSheet", "1250[J/kg/K]", "jones 2001");
-    model.param().set("specificHeatCell", "677[J/kg/K]", "jones 2001");
-    model.param().set("irradBackFraction", "0.1");
-    model.param().set("absBackSheet", "0.33");
+    model.param().set("specificHeatBackSheet", "1250[J/kg/K]", "back sheet specific heat, from Jones 2001");
+    model.param().set("specificHeatCell", "677[J/kg/K]", "cell specific heat, from Jones 2001");
+    model.param().set("irradBackFraction", "0.1", "fraction of the front irradiance that falls on the module's back surface, measured at NREL on the POOMA test rack");
+    model.param().set("absBackSheet", "0.33", "solar-weighted absorptivity of the backsheet, measured at NREL for a PVF-PET-EVA backsheet");
 
     model.component().create("comp1", false);
 
@@ -71,7 +92,6 @@ public class TOMCAT_TMY {
     model.func().create("an2", "Analytic");
     model.func().create("an3", "Analytic");
     model.func().create("int1", "Interpolation");
-    model.func().create("an6", "Analytic");
 
     model.func("an2").label("ground temperature");
     model.func("an2").set("funcname", "temp_ground_striped");
@@ -236,30 +256,7 @@ public class TOMCAT_TMY {
     model.component("comp1").mesh("mesh1").feature("map1").feature("size2").selection().geom("geom1", 2);
     model.component("comp1").mesh("mesh1").feature("map1").feature("size2").selection().set(new int[]{1, 2, 3, 4, 5});
 
-    // model.result().table("tbl1").comments("Surface Average 1 (T)");
-    // model.result().table("tbl2").comments("Surface Average 1 (T)");
-    // model.result().table("tbl3").comments("Line Average 2 (T)");
-    // model.result().table("tbl4").comments("Global Evaluation 1 (TSky(temp(t)))");
-    // model.result().table("tbl5").comments("Global Evaluation 2 (aveop1(T))");
-    // model.result().table("tbl6").comments("Line Average 3 (T-TAmbientConvection)");
-    // model.result().table("tbl7").comments("Global Evaluation 2 (TSky(temp(t)))");
-    // model.result().table("tbl8").comments("Surface Average 4 (T)");
-    // model.result().table("tbl9")
-    //      .comments("Global Evaluation 3 (poai(t*1[1/s])*absSi*(efficiencyElectricalSTC*(1+efficiencyElectricalTempCo[1/K]*(aveop1(T)-298.15[K]))))");
-    // model.result().table("tbl10").comments("Point Evaluation 1 (T)");
-
     model.capeopen().label("Thermodynamics Package");
-
-    model.component("comp1").view("view1").axis().set("xmin", 0.3751038908958435);
-    model.component("comp1").view("view1").axis().set("xmax", 0.38994425535202026);
-    model.component("comp1").view("view1").axis().set("ymin", 0.8164626359939575);
-    model.component("comp1").view("view1").axis().set("ymax", 0.8275125026702881);
-    model.component("comp1").view("view1").axis().set("abstractviewlratio", 0.5187551975250244);
-    model.component("comp1").view("view1").axis().set("abstractviewrratio", -0.48050278425216675);
-    model.component("comp1").view("view1").axis().set("abstractviewbratio", 0.7123233675956726);
-    model.component("comp1").view("view1").axis().set("abstractviewtratio", -0.2780361473560333);
-    model.component("comp1").view("view1").axis().set("abstractviewxscale", 1.1486350558698177E-5);
-    model.component("comp1").view("view1").axis().set("abstractviewyscale", 1.1486347830214072E-5);
 
     model.component("comp1").material("mat1").label("FrontSheet");
     model.component("comp1").material("mat1").propertyGroup("def")
@@ -315,7 +312,6 @@ public class TOMCAT_TMY {
     model.component("comp1").physics("ht").feature("hf1").label("radiation flux");
     model.component("comp1").physics("ht").feature("hf2").set("HeatFluxType", "ConvectiveHeatFlux");
     model.component("comp1").physics("ht").feature("hf2").set("HeatTransferCoefficientType", "ExtForcedConvection");
-    model.component("comp1").physics("ht").feature("hf2").set("h", 20);
     model.component("comp1").physics("ht").feature("hf2").set("Lpl", "hModule*convectionLengthFactor");
     model.component("comp1").physics("ht").feature("hf2").set("U", "wind_speed(t*1[1/s])");
     model.component("comp1").physics("ht").feature("hf2").set("Text", "temp(t*1[1/s])");
@@ -460,18 +456,11 @@ public class TOMCAT_TMY {
     model.result().dataset("cpt1").set("pointx", "hModule*cos(tilt)/2");
     model.result().dataset("cpt1").set("pointy", "hModule*sin(tilt)/2+hAboveGround");
 
-    // model.result().numerical("av1").label("surface temperature");
-    // model.result().numerical("av1").set("table", "tbl1");
-    // model.result().numerical("av1").set("unit", new String[]{"degC"});
-    // model.result().numerical("av1").setResult();
-    // model.result().table("tbl1").save(model.modelPath()+"ModelOutput_SurfaceTemperature.csv");
-
     model.result().numerical("av2").label("cell temperature");
     model.result().numerical("av2").set("table", "tbl2");
     model.result().numerical("av2").set("unit", new String[]{"degC"});
     model.result().numerical("av2").setResult();
     model.result().table("tbl2").save(model.modelPath()+"ModelOutput_Temperature.csv");
-    // model.result().table("tbl2").save("ModelOutput_Temperature.csv");
 
     model.result().numerical("gev1").label("power");
     model.result().numerical("gev1").set("table", "tbl3");
@@ -480,15 +469,6 @@ public class TOMCAT_TMY {
     model.result().numerical("gev1").set("descr", new String[]{"power"});
     model.result().numerical("gev1").setResult();
     model.result().table("tbl3").save(model.modelPath()+"ModelOutput_Power.csv");
-    // model.result().table("tbl3").save("ModelOutput_Power.csv");
-
-
-    // model.result().numerical("pev1").label("surface temperature center");
-    // model.result().numerical("pev1").set("data", "cpt1");
-    // model.result().numerical("pev1").set("table", "tbl4");
-    // model.result().numerical("pev1").set("unit", new String[]{"degC"});
-    // model.result().numerical("pev1").setResult();
-    // model.result().table("tbl4").save(model.modelPath()+"ModelOutput_CenterTemperature.csv");
 
     model.result("pg1").set("looplevel", new int[]{1});
     model.result("pg1").set("edges", false);
@@ -530,13 +510,6 @@ public class TOMCAT_TMY {
     model.result().export("anim1").set("target", "player");
     model.result().export("anim1").set("framesel", "all");
     model.result().export("anim1").set("synchronize", false);
-
-
-   // try {
-   //     model.save(model.modelPath()+"TOMCATFinished.mph");
-   // } catch (IOException thisException){
-   //     thisException.printStackTrace();
-   // }
 
     return model;
   }

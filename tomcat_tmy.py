@@ -104,7 +104,7 @@ def hemi_ave(theta, y, lower_limit=0, upper_limit=90, step=1):
     return ave
 
 
-def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, out_file=None):
+def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, out_file_time_series=None, out_file_tilt=None):
     '''
     Generates TOMCAT input based on TMY and optical data
 
@@ -114,8 +114,10 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     optics_file: str specifying the optics file
     array_tilt: The tilt of the PV array in degrees. 0 is horizontal
     array_azimuth: The azimuth of the PV array in degrees east of north. 0 is north
-    out_file (optional): str specifying output file. If None, no file
-        is written
+    out_file_time_series (optional): str specifying output CSV file name for the time
+        series data. If None, no file is written
+    out_file_tilt (optional): str specifying output TXT file name for the tilt data.
+        If None, no file is written
 
     Returns
     -------
@@ -221,10 +223,17 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     out['elapsed'] = 3600. + (out.index - out.index[0]).astype(np.timedelta64()) / 1.e9
     out.set_index('elapsed', inplace=True)
 
-    if out_file:
-        if type(out_file) is not str:
+    if out_file_time_series:
+        if type(out_file_time_series) is not str:
             raise TypeError(
-                'out_file must be a string specifying the desired output filename')
-        out.to_csv(out_file)
+                'out_file_time_series must be a string specifying the desired filename for CSV output')
+        out.to_csv(out_file_time_series)
+
+    if out_file_tilt:
+        if type(out_file_tilt) is not str:
+            raise TypeError(
+                'out_file_tilt must be a string specifying the desired filename for TXT output')
+        with open(out_file_tilt, 'w') as tilt_file:
+            tilt_file.write(str(array_tilt))
 
     return out
