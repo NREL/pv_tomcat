@@ -13,7 +13,7 @@ The TOMCAT framework requires the following.
 1. The angularly- and spectrally-resolved optical absorption in each layer of the module. This can be calculated, for example, with the module ray-tracing simulations that are available in [SunSolve](https://www.pvlighthouse.com.au/sunsolve).
 1. [COMSOL Multiphysics](https://www.comsol.com) and the COMSOL Heat Transfer Module, for conduction and radiation simulations
 1. A COMSOL model of a PV system (an example is included)
-1. Python and the Python functions, included in this repository, for preparing inputs to the COMSOL model
+1. Python and the Python functions, included in this repository, for preparing inputs to the COMSOL model. The python functions here have been tested in Python 3.6 with the environment described in `requirements.txt`. These packages can be installed with `pip install -r requirements.txt`
 1. A weather input file, such as a TMY3 file
 
 ## Doing the example simulation
