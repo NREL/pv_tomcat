@@ -104,7 +104,7 @@ def hemi_ave(theta, y, lower_limit=0, upper_limit=90, step=1):
     return ave
 
 
-def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, out_file_time_series=None, out_file_tilt=None):
+def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, out_file_time_series='TOMCAT_input.csv', out_file_tilt='TOMCAT_tilt.txt'):
     '''
     Generates TOMCAT input based on TMY and optical data
 
@@ -114,9 +114,9 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
     optics_file: str specifying the optics file
     array_tilt: The tilt of the PV array in degrees. 0 is horizontal
     array_azimuth: The azimuth of the PV array in degrees east of north. 0 is north
-    out_file_time_series (optional): str specifying output CSV file name for the time
+    out_file_time_series: str specifying output CSV file name for the time
         series data. If None, no file is written
-    out_file_tilt (optional): str specifying output TXT file name for the tilt data.
+    out_file_tilt: str specifying output TXT file name for the tilt data.
         If None, no file is written
 
     Returns
