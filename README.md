@@ -29,11 +29,11 @@ One way to obtain the angularly- and spectrally-resolved optical absorption in e
 
 #### Optics file format
 The optics file details where solar radiation is absorbed within the module and photocurrent changes for different angles of incidence. It must be a `.csv` file with the following column names. Note that all values in the optics file should include cosine factors from angle of incidence.  
-`angle` The angle of incidence for solar illumination in degrees, 0 is normal  
-`glass_abs_W/m2` Absorbed energy in the front glass  
-`encapsulant_abs_W/m2` Absorbed energy in the front encapsulant  
-`cell_abs_W/m2` Absorbed energy in the front cell  
-`current_factor` The fractional change in photocurrent from relative to the value corresponding to the `efficiencyElectricalSTC` parameter in the FEM simulation
+* `angle` The angle of incidence for solar illumination in degrees, 0 is normal  
+* `glass_abs_W/m2` Absorbed energy in the front glass  
+* `encapsulant_abs_W/m2` Absorbed energy in the front encapsulant  
+* `cell_abs_W/m2` Absorbed energy in the front cell  
+* `current_factor` The fractional change in photocurrent from relative to the value corresponding to the `efficiencyElectricalSTC` parameter in the FEM simulation
 
 ### Preparing time-series and tilt input files
 
