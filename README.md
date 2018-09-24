@@ -1,5 +1,5 @@
-# pv_tomcat
-TOMCAT is a simulation framework for predicting photovoltaic (PV) cell operating temperature as a function of measurable optical and thermal module properties and ambient weather conditions. It is designed to support research into innovative methods for increasing energy yield through reduced operating temperature.
+# PV TOMCAT
+PV TOMCAT (or TOMCAT) is a simulation framework for predicting photovoltaic (PV) cell operating temperature as a function of measurable optical and thermal module properties and ambient weather conditions. It is designed to support research into innovative methods for increasing energy yield through reduced operating temperature.
 
 ## Requirements
 
@@ -93,6 +93,12 @@ Formal development of TOMCAT ended on 30 September, 2018. Users are encouraged t
 ## Citing TOMCAT
 
 If you use part or all of TOMCAT, please cite it and link to this repository.
+
+## References
+
+TOMCAT is directly descended from the thermal model described in the following paper.
+
+> T J Silverman, M G Deceglie, I Subedi, N J Podraza, I M Slauch, V E Ferry, I Repins. [Reducing operating temperature in photovoltaic modules](https://ieeexplore.ieee.org/document/8252698/). IEEE Journal of Photovoltaics, 2018.
 
 ## Acknowledgment
 
