@@ -5,8 +5,7 @@ PV TOMCAT (or TOMCAT) is a simulation framework for predicting photovoltaic (PV)
 
 The TOMCAT framework requires the following.
 
-1. [SunSolve](https://www.pvlighthouse.com.au/sunsolve), for ray-tracing simulations of module optics
-1. A SunSolve model of a PV module (an example is included)
+1. The angularly- and spectrally-resolved optical absorption in each layer of the module. This can be calculated, for example, with the module ray-tracing simulations that are available in [SunSolve](https://www.pvlighthouse.com.au/sunsolve).
 1. [COMSOL Multiphysics](https://www.comsol.com) and the COMSOL Heat Transfer Module, for conduction and radiation simulations
 1. A COMSOL model of a PV system (an example is included)
 1. Python and the Python functions, included in this repository, for preparing inputs to the COMSOL model
@@ -17,14 +16,14 @@ The TOMCAT framework requires the following.
 Before you customize the TOMCAT simulation to your needs, it is recommended to run the example simulation. This will familiarize you with the framework and will confirm that all of the tools are in place.
 
 ### Optical simulation
-
-1. Log into [SunSolve](https://www.pvlighthouse.com.au/sunsolve), a cloud-based ray tracing tool for PV module optics
-1. Load the example file `baseline harmonized.pvl` from this repository
-1. Carry out an optical simulation, sweeping angle of incidence from 0 to 88 degrees in steps of 11 degrees
+One way to obtain the angularly- and spectrally-resolved optical absorption in each layer of the module is to calculate it with SunSolve. This example illustrates that approach, but other optical models may be used to generate the optics file in the format specified below.  
+1. Log into [SunSolve](https://www.pvlighthouse.com.au/sunsolve), a cloud-based ray tracing tool for PV module optics  
+1. Load the example file `baseline harmonized.pvl` from this repository  
+1. Carry out an optical simulation, sweeping angle of incidence from 0 to 88 degrees in steps of 11 degrees  
 1. Prepare an **optics file** from the results
 
 #### Optics file format
-The optics file details where solar radiation is absorbed within the module and photocurrent changes for different angles of incidence. It must be a `.csv` file with the following column names. Note that all values should include cosine losses from angle of incidence.  
+The optics file details where solar radiation is absorbed within the module and photocurrent changes for different angles of incidence. It must be a `.csv` file with the following column names. Note that all values in the optics file should include cosine factors from angle of incidence.  
 `angle` The angle of incidence for solar illumination in degrees, 0 is normal  
 `glass_abs_W/m2` Absorbed energy in the front glass  
 `encapsulant_abs_W/m2` Absorbed energy in the front encapsulant  
@@ -71,13 +70,13 @@ The COMSOL documentation covers running `class` files without the COMSOL GUI (in
 
 ### Optical changes
 
-Changes to optical properties or to the optical stack representing the PV module and solar cell should be made in SunSolve. Don't forget to propagate these changes all the way to the time-series file.
+Changes to optical properties or to the optical stack representing the PV module and solar cell should be made in the optical model of the module. Don't forget to propagate these changes through the TOMCAT optics file all the way to the time-series file.
 
 ### Changes to weather conditions
 
 Weather files from any of the [>1000 TMY3 locations](https://rredc.nrel.gov/solar/old_data/nsrdb/1991-2005/tmy3/) can be used without modification.
 
-Weather data from other sources, for instance from local meteorological measurement stations with higher measurement frequency than hourly, can also be used. Because every met station is different, it is the user's responsibility to ensure that local weather data are used correctly to generate the time-series input file.
+Weather data from other sources, for instance from local meteorological measurement stations with higher measurement frequency than hourly, can also be used. Because every met station is different, it is the user's responsibility to ensure that local weather data are used correctly to generate the time-series input file. In addition, the functions provided here are designed to parse TMY3 files, other formats may be accomidated through modification of `generate_input()`.
 
 ### Thermal, electrical, and geometric changes
 
@@ -92,13 +91,12 @@ Formal development of TOMCAT ended on 30 September, 2018. Users are encouraged t
 
 ## Citing TOMCAT
 
-If you use part or all of TOMCAT, please cite it and link to this repository.
+If you use part or all of TOMCAT, please cite it, including the version number and url of this repository.
 
-## References
-
-TOMCAT is directly descended from the thermal model described in the following paper.
+Please also cite the following paper, which describes an early version of TOMCAT:
 
 > T J Silverman, M G Deceglie, I Subedi, N J Podraza, I M Slauch, V E Ferry, I Repins. [Reducing operating temperature in photovoltaic modules](https://ieeexplore.ieee.org/document/8252698/). IEEE Journal of Photovoltaics, 2018.
+
 
 ## Acknowledgment
 
