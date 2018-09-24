@@ -326,13 +326,13 @@ def parse_pvl(pvl_file, glass_columns, front_encapsulant_columns, cell_columns, 
 
         result_dict['angle'] = angle
         result_dict['glass_abs_W/m2'] = total_glass_abs
-        result_dict['ecapsulant_abs_W/m2'] = total_front_encapsulant_abs
+        result_dict['encapsulant_abs_W/m2'] = total_front_encapsulant_abs
         result_dict['cell_abs_W/m2'] = total_cell_abs
         result_dict['current_factor'] = current_factor
 
         results.append(result_dict)
     out = pd.DataFrame(results)
-    out = out[['angle', 'glass_abs_W/m2', 'ecapsulant_abs_W/m2',
+    out = out[['angle', 'glass_abs_W/m2', 'encapsulant_abs_W/m2',
                'cell_abs_W/m2', 'current_factor']]
 
     if out_file:
