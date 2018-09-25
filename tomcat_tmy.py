@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pvlib
 from scipy.interpolate import interp1d
+from scipy.integrate import trapz
 import csv
 import warnings
 
@@ -236,4 +237,104 @@ def generate_input(tmy_file, optics_file, array_tilt=40.0, array_azimuth=180.0, 
         with open(out_file_tilt, 'w') as tilt_file:
             tilt_file.write(str(array_tilt))
 
+    return out
+
+
+def total_abs(spectral_abs, spectral_power):
+    '''Return the total absorption based on spectrally resolve absorption and power,
+    both inputs are pandas series with wavelength index'''
+    power_absorbed = spectral_power * spectral_abs
+    total_power_absorbed = trapz(power_absorbed, power_absorbed.index)
+    return total_power_absorbed
+
+
+def parse_pvl(pvl_file, glass_columns, front_encapsulant_columns, cell_columns, photocurrent_columns,
+              normal_incidence_current_factor=1, out_file='optics.csv', iqe_file='IQE.csv', iqe_header_rows=2,
+              angle_col='Source #1 zenith(°)'):
+    '''
+    Generates optics file appropriate for generate_input() based on PVLighthouse results from SunSolve v3.5.3.
+    Changes to SunSolve output in future versions may cause problems. input based on TMY and optical data
+
+    Parameters
+    ----------
+    pvl_file: string specifying a SunSolve result file containing spectral- and angle-resolved RAT data.
+    glass_columns: list of strings specifying the columns to include in glass absorption
+    front_encapsulant_columns: list of strings specifying the columns to include in front encapsulant absorption
+    cell_columns: list of strings specifying the columns to include in cell absorption
+    photocurrent_columns: list of strings specifying the columns where absorption is interpreted to generate photocurrent
+    normal_incidence_current_factor: (numeric) The current factor for normal incidence
+    out_file: string specifying the file name for the optics file to be written. If None, no file is written
+    iqe_file: string specifying an IQE file to be used when calculating photocurrent. The IQE file must have columns of
+              (wavelength(nm), IQE)
+    iqe_header_rows: Integer passed to pandas.read_csv(header=) for parsing iqe_file
+    angle_col: string specifying the column containing the angle of incidence
+
+    Returns
+    -------
+    Pandas dataframe corresponding to the optics file for generate_input()
+    '''
+
+    # Read the pvl results file
+    optics_results = pd.read_csv(pvl_file)
+    optics_results.set_index('Wavelength (nm)', inplace=True)
+
+    # Parse the IQE file
+    iqe = pd.read_csv(iqe_file, header=iqe_header_rows)
+    iqe.columns = ['wl', 'iqe']
+    iqe = iqe.set_index('wl')
+    iqe = iqe.sort_index()
+    iqe_interp = interp1d(iqe.index, iqe.iqe, fill_value='extrapolate')
+
+    # Incorporate IQE into the main results df
+    optics_results['iqe'] = iqe_interp(optics_results.index)
+
+    # get angles and ensure they include 0
+    angles = optics_results[angle_col].unique()
+    if 0 not in angles:
+        raise ValueError('Results for normal incidence must be included.')
+
+    # handle normal incidence photocurrent first
+    angle = 0
+    df = optics_results[optics_results[angle_col] == angle]
+    photocurrent_abs = df[photocurrent_columns].sum(axis=1)
+    photocurrent = df['iqe'] * \
+        df['Photon flux in WL bin (A cm-2)'] * photocurrent_abs
+    normal_photocurrent = photocurrent.sum()
+
+    # Generate optics parameters for each angle
+    results = []
+    for angle in angles:
+        result_dict = {}
+
+        df = optics_results[optics_results[angle_col] == angle]
+
+        glass_abs = df[glass_columns].sum(axis=1)
+        front_encapsulant_abs = df[front_encapsulant_columns].sum(axis=1)
+        cell_abs = df[cell_columns].sum(axis=1)
+        photocurrent_abs = df[photocurrent_columns].sum(axis=1)
+
+        total_glass_abs = total_abs(
+            glass_abs, df['Spectral intensity (W m-2 nm-1)'])
+        total_cell_abs = total_abs(cell_abs, df['Spectral intensity (W m-2 nm-1)'])
+        total_front_encapsulant_abs = total_abs(
+            front_encapsulant_abs, df['Spectral intensity (W m-2 nm-1)'])
+
+        photocurrent = df['iqe'] * df['Photon flux in WL bin (A cm-2)'] * photocurrent_abs
+        photocurrent = photocurrent.sum()
+
+        current_factor = normal_incidence_current_factor * photocurrent / normal_photocurrent
+
+        result_dict['angle'] = angle
+        result_dict['glass_abs_W/m2'] = total_glass_abs
+        result_dict['encapsulant_abs_W/m2'] = total_front_encapsulant_abs
+        result_dict['cell_abs_W/m2'] = total_cell_abs
+        result_dict['current_factor'] = current_factor
+
+        results.append(result_dict)
+    out = pd.DataFrame(results)
+    out = out[['angle', 'glass_abs_W/m2', 'encapsulant_abs_W/m2',
+               'cell_abs_W/m2', 'current_factor']]
+
+    if out_file:
+        out.to_csv(out_file, index=False)
     return out

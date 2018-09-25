@@ -13,7 +13,7 @@ The TOMCAT framework requires the following.
 1. The angularly- and spectrally-resolved optical absorption in each layer of the module. This can be calculated, for example, with the module ray-tracing simulations that are available in [SunSolve](https://www.pvlighthouse.com.au/sunsolve).
 1. [COMSOL Multiphysics](https://www.comsol.com) and the COMSOL Heat Transfer Module, for conduction and radiation simulations
 1. A COMSOL model of a PV system (an example is included)
-1. Python and the Python functions, included in this repository, for preparing inputs to the COMSOL model
+1. Python and the Python functions, included in this repository, for preparing inputs to the COMSOL model. The python functions here have been tested in Python 3.6 with the environment described in `requirements.txt`. These packages can be installed with `pip install -r requirements.txt`
 1. A weather input file, such as a TMY3 file
 
 ## Doing the example simulation
@@ -23,9 +23,10 @@ Before you customize the TOMCAT simulation to your needs, it is recommended to r
 ### Optical simulation
 One way to obtain the angularly- and spectrally-resolved optical absorption in each layer of the module is to calculate it with SunSolve. This example illustrates that approach, but other optical models may be used to generate the optics file in the format specified below.  
 1. Log into [SunSolve](https://www.pvlighthouse.com.au/sunsolve), a cloud-based ray tracing tool for PV module optics  
-1. Load the example file `baseline harmonized.pvl` from this repository  
-1. Carry out an optical simulation, sweeping angle of incidence from 0 to 88 degrees in steps of 11 degrees  
-1. Prepare an **optics file** from the results
+1. Load the example file `example/TOMCAT example.sim` from this repository. Two important features are that the wavelength range of the simulation is extended beyond the bandgap to 2500 nm and that the angle of incidence is swept from 0 to near 90 degrees.
+1. Run the SunSolve simulation 
+1. Download a `.csv` of the reflectaion, absorption, transmission results ('Export RAT Data') in a single file
+1. Generate the optics file from the RAT results with `tomcat_tmy.parse_pvl()`
 
 #### Optics file format
 The optics file details where solar radiation is absorbed within the module and photocurrent changes for different angles of incidence. It must be a `.csv` file with the following column names. Note that all values in the optics file should include cosine factors from angle of incidence.  
@@ -38,16 +39,9 @@ The optics file details where solar radiation is absorbed within the module and 
 ### Preparing time-series and tilt input files
 
 1. Select a [TMY3](https://www.nrel.gov/docs/fy08osti/43156.pdf) weather file
-1. Use the `generate_input` function in `tomcat_tmy.py` to combine the weather file and the optics file into a **time-series file** named `TOMCAT_input.csv` and a **tilt file** named `TOMCAT_tilt.txt`
+1. Use `tomcat_tmy.generate_input()` to combine the weather file and the optics file into a **time-series file** named `TOMCAT_input.csv` and a **tilt file** named `TOMCAT_tilt.txt`
 
-#### Using `generate_input`
-The following example generates two input files for FEM calculations: `TOMCAT_input.csv` contains time-series inputs and `TOMCAT_tilt.txt` contains the array tilt. The `generate_input` function creates these files based on [TMY3](https://www.nrel.gov/docs/fy08osti/43156.pdf) and optics input files.
-
-```python
-from tomcat_tmy import generate_input
-
-input_df = generate_input(tmy_file, optics_file, out_file_time_series='TOMCAT_input.csv', out_file_tilt='TOMCAT_tilt.txt')
-```
+**The above example steps are shown in `example/example.py`**
 
 ### Thermal simulation
 
