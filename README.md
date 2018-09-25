@@ -3,7 +3,7 @@ PV TOMCAT (or TOMCAT) is a simulation framework for predicting photovoltaic (PV)
 
 ## Example results
 
-The table below shows several example thermal management strategies for PV modules. The first column gives a description of a thermal management approach. The second column shows the levelized cost of energy (LCOE) in Kansas City, Missouri (KCMO), calculated using the `lcoe()` function or the `pvlcoe.nrel.gov` calculator. We give LCOE assuming the only benefit of temperature reduction is improved energy output, ignoring the service life extension that is enabled by reducing operating temperature. The 'LCOE reduction' column shows the percentage reduction compared to the 'baseline' case. The 'breakeven cost' column shows the maximum cost that an extra component could have and still remain at or below the baseline LCOE. The 'reference' column contains a note referring to one of the works in the References section of this file.
+The table below shows several example thermal management strategies for PV modules. The first column gives a description of a thermal management approach. The second column shows the levelized cost of energy (LCOE) in Kansas City, Missouri (KCMO), calculated using the `lcoe.lcoe()` function or the `pvlcoe.nrel.gov` calculator. Example LCOE calculations are shown in `examples/lcoe_example.py`. We give LCOE assuming the only benefit of temperature reduction is improved energy output, ignoring the service life extension that is enabled by reducing operating temperature. The 'LCOE reduction' column shows the percentage reduction compared to the 'baseline' case. The 'breakeven cost' column shows the maximum cost that an extra component could have and still remain at or below the baseline LCOE. The 'reference' column contains a note referring to one of the works in the References section of this file.
 
 | modification                                                                                        | LCOE in KCMO (USD/kWh) | LCOE reduction | breakeven cost (USD/m^2) | reference                         |
 |-----------------------------------------------------------------------------------------------------|------------------------|----------------|--------------------------|-----------------------------------|
@@ -39,7 +39,7 @@ Before you customize the TOMCAT simulation to your needs, it is recommended to r
 ### Optical simulation
 One way to obtain the angularly- and spectrally-resolved optical absorption in each layer of the module is to calculate it with SunSolve. This example illustrates that approach, but other optical models may be used to generate the optics file in the format specified below.  
 1. Log into [SunSolve](https://www.pvlighthouse.com.au/sunsolve), a cloud-based ray tracing tool for PV module optics  
-1. Load the example file `example/TOMCAT example.sim` from this repository. Two important features are that the wavelength range of the simulation is extended beyond the bandgap to 2500 nm and that the angle of incidence is swept from 0 to near 90 degrees.
+1. Load the example file `examples/TOMCAT example.sim` from this repository. Two important features are that the wavelength range of the simulation is extended beyond the bandgap to 2500 nm and that the angle of incidence is swept from 0 to near 90 degrees.
 1. Run the SunSolve simulation 
 1. Download a `.csv` of the reflection, absorption, transmission results ('Export RAT Data') in a single file
 1. Generate the optics file from the RAT results with `tomcat_tmy.parse_pvl()`
@@ -57,7 +57,7 @@ The optics file details where solar radiation is absorbed within the module and 
 1. Select a [TMY3](https://www.nrel.gov/docs/fy08osti/43156.pdf) weather file
 1. Use `tomcat_tmy.generate_input()` to combine the weather file and the optics file into a **time-series file** named `TOMCAT_input.csv` and a **tilt file** named `TOMCAT_tilt.txt`
 
-**The above example steps are shown in `example/example.py`**
+**The above example steps are shown in `examples/example.py`**
 
 ### Thermal simulation
 
