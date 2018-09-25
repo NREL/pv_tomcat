@@ -118,7 +118,7 @@ Please also cite the following paper, which describes an early version of TOMCAT
 
 > I M Slauch, M G Deceglie, T J Silverman, V E Ferry. [Spectrally selective mirrors with combined optical and thermal benefit for photovoltaic module thermal management](https://pubs.acs.org/doi/abs/10.1021/acsphotonics.7b01586). ACS Photonics, 2018.
 
-> TJ Silverman, MG Deceglie, KA Horowitz. “NREL Comparative PV LCOE Calculator.” Internet: http://pvlcoe.nrel.gov, March 2018.
+> T J Silverman, M G Deceglie, K A Horowitz. “NREL Comparative PV LCOE Calculator.” Internet: http://pvlcoe.nrel.gov, March 2018.
 
 ## Acknowledgment
 
