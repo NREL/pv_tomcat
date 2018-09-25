@@ -35,6 +35,8 @@ lcoe_baseline = lcoe.lcoe(energy_yield=1589, cost_module=cost_module, **lcoe_arg
 
 def lcoe_difference(cost_extra):
     return lcoe.lcoe(energy_yield=1589 * energy_factor, cost_module=cost_module + cost_extra, **lcoe_arguments) - lcoe_baseline
+
+
 breakeven_cost = scipy.optimize.newton(lcoe_difference, 0)
 print('For a module that produces {}x as much energy, the additional cost can be up to {} USD/m^2'.format(
     np.round(energy_factor, 2),
