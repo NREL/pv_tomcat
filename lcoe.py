@@ -27,22 +27,29 @@ def lcoe(cost_module=1.15 * 58.78, cost_om=15.40, r_degradation=0.36,
     The default values are correct (matching the web version of the
     calculator) as of 2018-09-24.
 
-    cost_module in $/m^2
-    cost_om in $/kW/year
-    r_degradation rate in %/year
-    r_discount in %
-    energy_yield in h
-    service life in year
-    efficiency in %
-    bos_cost_tree is a nested dict like at
+    Parameters:
+    ----------
+    cost_module: module cost in $/m^2
+    cost_om: operations and maintenance cost in $/kW/year
+    r_degradation: degradation rate in %/year
+    r_discount: discount rate in %
+    energy_yield: in hours
+    service_life: in years
+    efficiency: in %
+    bos_cost_tree: a nested dict like at
         https://www.nrel.gov/pv/lcoe-calculator/js/bos_cost_tree.js
         If none is specified, this one will be loaded and used. Note
         that this can take a lot of extra time, so for repeated calls of
         lcoe(), consider loading bos_cost_tree once with an external
         call to fetch_bos_cost_tree() and passing the result to lcoe()
-    system_type is one of 'fixed tilt, utility scale',
-        'single-axis tracked, utility scale', or
-        'roof-mounted, residential scale'
+    system_type: one of:
+                 'fixed tilt, utility scale',
+                 'single-axis tracked, utility scale', or
+                 'roof-mounted, residential scale'
+
+    Returns
+    -------
+    Levelized cost of electricity in USD/kWh
     '''
 
     if bos_cost_tree is None:
