@@ -1,6 +1,22 @@
 # PV TOMCAT
 PV TOMCAT (or TOMCAT) is a simulation framework for predicting photovoltaic (PV) cell operating temperature as a function of measurable optical and thermal module properties and ambient weather conditions. It is designed to support research into innovative methods for increasing energy yield through reduced operating temperature.
 
+## Example results
+
+The table below shows several example thermal management strategies for PV modules. The first column gives a description of a thermal management approach. The second column shows the levelized cost of energy (LCOE) in Kansas City, Missouri (KCMO), calculated using the `lcoe()` function or the `pvlcoe.nrel.gov` calculator. We give LCOE assuming the only benefit of temperature reduction is improved energy output, ignoring the service life extension that is enabled by reducing operating temperature. The 'LCOE reduction' column shows the percentage reduction compared to the 'baseline' case. The 'breakeven cost' column shows the maximum cost that an extra component could have and still remain at or below the baseline LCOE. The 'reference' column contains a note referring to one of the works in the References section of this file.
+
+| modification                                                                                        | LCOE in KCMO (USD/kWh) | LCOE reduction | breakeven cost (USD/m^2) | reference                         |
+|-----------------------------------------------------------------------------------------------------|------------------------|----------------|--------------------------|-----------------------------------|
+| baseline                                                                                            | 0.0670                 |                |                          |                                   |
+| double thermal conductivity in packaging behind the cell                                            | 0.0669                 | 0%             | 0.20                     | Silverman 2017, Table II, item 20 |
+| maximum possible thermal emissivity on front and back surfaces                                      | 0.0666                 | 1%             | 1.18                     | Silverman 2017, Table II, item 17 |
+| Li 2017 omnidirectional multi-layer reflector on cover glass                                        | 0.0660                 | 1%             | 2.95                     | Silverman 2017, Table II, item 9  |
+| Li 2017 multi-layer reflector on cover glass                                                        | 0.0657                 | 2%             | 3.73                     | Silverman 2017, Table II, item 8  |
+| Slauch 2018 omnidirectional multi-layer reflector on cover glass                                    | 0.0646                 | 4%             | 7.27                     | Slauch 2018                       |
+| Ideal sub-bandgap reflector underneath cover glass                                                  | 0.0658                 | 2%             | 3.34                     | Silverman 2017, Table II, item 3  |
+| Ideal sub-bandgap reflector underneath cover glass and ideal anti-reflective coating on cover glass | 0.0617                 | 8%             | 16.89                    | Silverman 2017, Table II, item 5  |
+
+
 ## Assumptions
 The following assumptions are implicit in the initial TOMCAT release. It is possible to update it to handle conditions not covered by these assumptions.
 1. The PV module is of the construction glass/encapsulant/cell/encapsulant/backsheet
@@ -25,7 +41,7 @@ One way to obtain the angularly- and spectrally-resolved optical absorption in e
 1. Log into [SunSolve](https://www.pvlighthouse.com.au/sunsolve), a cloud-based ray tracing tool for PV module optics  
 1. Load the example file `example/TOMCAT example.sim` from this repository. Two important features are that the wavelength range of the simulation is extended beyond the bandgap to 2500 nm and that the angle of incidence is swept from 0 to near 90 degrees.
 1. Run the SunSolve simulation 
-1. Download a `.csv` of the reflectaion, absorption, transmission results ('Export RAT Data') in a single file
+1. Download a `.csv` of the reflection, absorption, transmission results ('Export RAT Data') in a single file
 1. Generate the optics file from the RAT results with `tomcat_tmy.parse_pvl()`
 
 #### Optics file format
@@ -75,7 +91,7 @@ Changes to optical properties or to the optical stack representing the PV module
 
 Weather files from any of the [>1000 TMY3 locations](https://rredc.nrel.gov/solar/old_data/nsrdb/1991-2005/tmy3/) can be used without modification.
 
-Weather data from other sources, for instance from local meteorological measurement stations with higher measurement frequency than hourly, can also be used. Because every met station is different, it is the user's responsibility to ensure that local weather data are used correctly to generate the time-series input file. In addition, the functions provided here are designed to parse TMY3 files, other formats may be accomidated through modification of `generate_input()`.
+Weather data from other sources, for instance from local meteorological measurement stations with higher measurement frequency than hourly, can also be used. Because every met station is different, it is the user's responsibility to ensure that local weather data are used correctly to generate the time-series input file. File formats other than TMY3 may be accommodated through modification of `generate_input()`.
 
 ### Thermal, electrical, and geometric changes
 
@@ -96,6 +112,11 @@ Please also cite the following paper, which describes an early version of TOMCAT
 
 > T J Silverman, M G Deceglie, I Subedi, N J Podraza, I M Slauch, V E Ferry, I Repins. [Reducing operating temperature in photovoltaic modules](https://ieeexplore.ieee.org/document/8252698/). IEEE Journal of Photovoltaics, 2018.
 
+## References
+
+> T J Silverman, M G Deceglie, I Subedi, N J Podraza, I M Slauch, V E Ferry, I Repins. [Reducing operating temperature in photovoltaic modules](https://ieeexplore.ieee.org/document/8252698/). IEEE Journal of Photovoltaics, 2018.
+
+> I M Slauch, M G Deceglie, T J Silverman, V E Ferry. [Spectrally selective mirrors with combined optical and thermal benefit for photovoltaic module thermal management](https://pubs.acs.org/doi/abs/10.1021/acsphotonics.7b01586). ACS Photonics, 2018.
 
 ## Acknowledgment
 
